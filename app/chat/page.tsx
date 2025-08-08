@@ -43,90 +43,32 @@ export default function ChatPage() {
       role: 'user'
     });
 
-    setLoading(true);
+      setLoading(true);
 
-    try {
-      // Mô phỏng gọi AI API
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      try {
+        const res = await fetch('/api/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ message: userMessage })
+        });
 
-      // Tạo phản hồi mẫu từ AI với formatting đẹp hơn
-      const aiResponses = [
-        `**🔮 Thông điệp từ vũ trụ về "${userMessage}"**
-        
-Tôi cảm nhận được năng lượng mạnh mẽ từ câu hỏi của bạn. Đây là những gì các vì sao muốn truyền tải:
-        
-**✨ Phân tích chi tiết:**
-        
-🌟 **Tình hình hiện tại:** Bạn đang đứng tại một ngã ba quan trọng trong cuộc đời. Những gì bạn đang trải qua không phải là ngẫu nhiên.
-        
-💫 **Cơ hội phát triển:**
-• Hãy tin tưởng vào trực giác bản thân
-• Đừng để sợ hãi ngăn cản bạn tiến lên
-• Thời điểm này rất thuận lợi để bắt đầu điều gì đó mới
-        
-**🎯 Lời khuyên từ các vì sao:**
-        
-Vũ trụ đang sắp xếp những điều tốt đẹp cho bạn. Hãy kiên nhẫn và giữ tâm thế tích cực. Câu trả lời bạn tìm kiếm sẽ đến vào đúng thời điểm.`,
-        
-        `**💖 Khám phá năng lượng xung quanh "${userMessage}"**
-        
-Tôi nhìn thấy những luồng năng lượng thú vị đang bao quanh chủ đề này:
-        
-**🌈 Góc nhìn tâm linh:**
-        
-🔥 **Nguyên tố chi phối:** Hỏa - mang đến sự năng động và đam mê
-🌊 **Cảm xúc hiện tại:** Như dòng nước chảy, đôi khi êm đềm, đôi khi sóng gió
-        
-**💡 Những điều cần lưu ý:**
-        
-• Không vội vàng đưa ra quyết định quan trọng
-• Lắng nghe tiếng nói bên trong nhiều hơn
-• Tìm kiếm sự cân bằng trong mọi việc
-        
-**✨ Thông điệp cuối:**
-        
-Hãy nhớ rằng mọi thử thách đều là cơ hội để bạn trưởng thành. Vũ trụ tin tưởng vào khả năng vượt qua mọi khó khăn của bạn.`,
+        const data = await res.json();
+        if (!res.ok) {
+          throw new Error(data.error || 'Lỗi gọi API');
+        }
 
-        `**🌟 Dự đoán và hướng dẫn về "${userMessage}"**
-        
-Các vì sao đã sắp xếp để tôi nhận được câu hỏi này từ bạn vào đúng thời điểm:
-        
-**📊 Phân tích tổng quan:**
-        
-🎭 **Quá khứ:** Những trải nghiệm trước đây đã tạo nền tảng vững chắc
-🎪 **Hiện tại:** Giai đoạn chuyển tiếp với nhiều cơ hội
-🎨 **Tương lai:** Ánh sáng hy vọng đang dần hiện ra
-        
-**🏆 Điểm mạnh của bạn:**
-        
-• Khả năng thích ứng tuyệt vời
-• Trái tim nhân ái và khao khát học hỏi
-• Sức mạnh tiềm ẩn chưa được khai phá hết
-        
-**⚠️ Những điều cần cân nhắc:**
-        
-• Đừng quá khắt khe với bản thân
-• Học cách tin tưởng vào quá trình phát triển
-• Tìm kiếm sự hỗ trợ từ những người xung quanh
-        
-**🎯 Kết luận:**
-        
-Vũ trụ đang dẫn dắt bạn đến những điều kỳ diệu. Hãy mở lòng đón nhận!`
-      ];
+        addMessage({
+          content: data.reply,
+          role: 'assistant'
+        });
+      } catch (error) {
+        console.error(error);
+        toast.error('Không thể kết nối tới AI');
+      } finally {
+        setLoading(false);
+      }
 
-      const randomResponse = aiResponses[Math.floor(Math.random() * aiResponses.length)];
-
-      addMessage({
-        content: randomResponse,
-        role: 'assistant'
-      });
-
-    } catch (error) {
-      toast.error('Có lỗi xảy ra khi kết nối với AI');
-    } finally {
-      setLoading(false);
-    }
-  };
+    };
 
   if (!isAuthenticated) {
     return null;
